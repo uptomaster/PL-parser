@@ -1,0 +1,14 @@
+실행 환경
+
+# 학교 리눅스 서버 이용
+  
+  설치
+sudo apt install flex bison gcc
+  
+  컴파일
+flex hw02_C111115.l
+bison -d hw02_C111115.y
+gcc lex.yy.c hw02_C111115.tab.c -o parser
+  
+  실행
+./parser < input.c
