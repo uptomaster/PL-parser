@@ -1,29 +1,28 @@
 %{
 #include "hw02_C111115.tab.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 int lexeme_count = 0;
 int id_count = 0;
 %}
 
 %%
-"int"       { lexeme_count++; return INT; }
-"if"        { lexeme_count++; return IF; }
-"else"      { lexeme_count++; return ELSE; }
-"while"     { lexeme_count++; return WHILE; }
-"return"    { lexeme_count++; return RETURN; }
+"int"      { lexeme_count++; return INT; }
+"main"     { lexeme_count++; return MAIN; }
+"if"       { lexeme_count++; return IF; }
+"else"     { lexeme_count++; return ELSE; }
+"while"    { lexeme_count++; return WHILE; }
+"return"   { lexeme_count++; return RETURN; }
 
-[0-9]+      { lexeme_count++; yylval.num = atoi(yytext); return NUMBER; }
+"=="| "!="| "<="| ">=" { lexeme_count++; return RELOP; }
+"<"|">"               { lexeme_count++; return RELOP; }
 
-[a-zA-Z][a-zA-Z0-9_]* {
-    lexeme_count++;
-    id_count++;
-    yylval.str = strdup(yytext);
-    return IDENT;
-}
+"+"|"-"               { lexeme_count++; return ADDOP; }
+"*"|"/"               { lexeme_count++; return MULOP; }
 
-// 연산자
-"=="|"!="|"<="|">="|"<"|">"|"+"|"-"|"*"|"/"|"=" { lexeme_count++; return OP; }
+"="                   { lexeme_count++; return ASSIGN; }
 
 ";" { lexeme_count++; return SEMI; }
 "," { lexeme_count++; return COMMA; }
@@ -32,12 +31,27 @@ int id_count = 0;
 "{" { lexeme_count++; return LB; }
 "}" { lexeme_count++; return RB; }
 
-// 주석 제거
-"//".*              { }
-"/*"([^*]|\*+[^*/])*\*+"/" { }
+[0-9]+ {
+    lexeme_count++;
+    yylval.num = atoi(yytext);
+    return NUMBER;
+}
 
-[ \t\n] { }
+[a-zA-Z][a-zA-Z0-9_]* {
+    lexeme_count++;
+    id_count++;
+    yylval.str = strdup(yytext);
+    return IDENT;
+}
 
-. { }
+/* block comment */
+"/*"([^*]|\*+[^*/])*\*+"/" {}
+
+/* line comment */
+"//".* {}
+
+[ \t\n\r]+ {}
+
+. {}
 
 %%

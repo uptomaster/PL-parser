@@ -5,24 +5,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-// AST 노드 구조
 typedef struct node {
-    char name[50];
+    char name[64];
     struct node* child;
     struct node* sibling;
 } Node;
 
-// 노드 생성
-Node* createNode(char* name) {
-    Node* newNode = (Node*)malloc(sizeof(Node));
-    strcpy(newNode->name, name);
-    newNode->child = NULL;
-    newNode->sibling = NULL;
-    return newNode;
+Node* createNode(const char* name) {
+    Node* n = (Node*)malloc(sizeof(Node));
+    strcpy(n->name, name);
+    n->child = NULL;
+    n->sibling = NULL;
+    return n;
 }
 
-// 자식 추가
 void addChild(Node* parent, Node* child) {
+    if (!child) return;
     if (!parent->child) parent->child = child;
     else {
         Node* temp = parent->child;
@@ -31,13 +29,18 @@ void addChild(Node* parent, Node* child) {
     }
 }
 
-// preorder 출력
+Node* linkSibling(Node* a, Node* b) {
+    if (!a) return b;
+    Node* t = a;
+    while (t->sibling) t = t->sibling;
+    t->sibling = b;
+    return a;
+}
+
 void printAST(Node* root, int depth) {
     if (!root) return;
-
     for (int i = 0; i < depth; i++) printf("  ");
     printf("%d %s\n", depth, root->name);
-
     printAST(root->child, depth + 1);
     printAST(root->sibling, depth);
 }

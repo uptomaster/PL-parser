@@ -12,3 +12,11 @@ gcc lex.yy.c hw02_C111115.tab.c -o parser
   
   실행
 ./parser < input.c
+
+
+# 정리
+-> 리눅스 / VMware / MobaXterm
+flex hw02_C111115.l
+bison -d hw02_C111115.y
+gcc lex.yy.c hw02_C111115.tab.c -o parser
+./parser < input.c
