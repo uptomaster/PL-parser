@@ -2,9 +2,6 @@
 
 # 학교 리눅스 서버 이용
   
-  설치
-sudo apt install flex bison gcc
-  
   컴파일
 flex hw02_C111115.l
 bison -d hw02_C111115.y
@@ -16,7 +13,31 @@ gcc lex.yy.c hw02_C111115.tab.c -o parser
 
 # 정리
 -> 리눅스 / VMware / MobaXterm
-flex hw02_C111115.l
+
+컴파일 및 실행 순서:
+
 bison -d hw02_C111115.y
-gcc lex.yy.c hw02_C111115.tab.c -o parser
-./parser < input.c
+flex -o lex.yy.c hw02_C111115.l
+gcc hw02_C111115.tab.c lex.yy.c -o parser
+
+테스트 파일 실행:
+
+./parser < test1.c
+
+테스트용 입력 파일 생성 예시:
+
+vi test1.c
+
+테스트 코드 내용
+
+int main() {
+    int a,b;
+
+    a = 3;
+    b = a + 2;
+
+    if (a < b)
+        b = b * 2;
+
+    return b;
+}

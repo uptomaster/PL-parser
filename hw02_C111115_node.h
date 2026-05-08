@@ -11,36 +11,54 @@ typedef struct node {
     struct node* sibling;
 } Node;
 
-Node* createNode(const char* name) {
+static Node* createNode(const char* name) {
     Node* n = (Node*)malloc(sizeof(Node));
+
     strcpy(n->name, name);
+
     n->child = NULL;
     n->sibling = NULL;
+
     return n;
 }
 
-void addChild(Node* parent, Node* child) {
+static void addChild(Node* parent, Node* child) {
     if (!child) return;
-    if (!parent->child) parent->child = child;
+
+    if (!parent->child) {
+        parent->child = child;
+    }
     else {
         Node* temp = parent->child;
-        while (temp->sibling) temp = temp->sibling;
+
+        while (temp->sibling)
+            temp = temp->sibling;
+
         temp->sibling = child;
     }
 }
 
-Node* linkSibling(Node* a, Node* b) {
+static Node* linkSibling(Node* a, Node* b) {
     if (!a) return b;
-    Node* t = a;
-    while (t->sibling) t = t->sibling;
-    t->sibling = b;
+
+    Node* temp = a;
+
+    while (temp->sibling)
+        temp = temp->sibling;
+
+    temp->sibling = b;
+
     return a;
 }
 
-void printAST(Node* root, int depth) {
+static void printAST(Node* root, int depth) {
     if (!root) return;
-    for (int i = 0; i < depth; i++) printf("  ");
+
+    for (int i = 0; i < depth; i++)
+        printf("  ");
+
     printf("%d %s\n", depth, root->name);
+
     printAST(root->child, depth + 1);
     printAST(root->sibling, depth);
 }
