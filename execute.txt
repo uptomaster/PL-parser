@@ -28,7 +28,7 @@ gcc hw02_C111115.tab.c lex.yy.c -o parser
 
 vi test1.c
 
-테스트 코드 내용
+예시 테스트 코드 내용
 
 int main() {
     int a,b;

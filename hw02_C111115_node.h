@@ -1,12 +1,11 @@
-#ifndef NODE_H
-#define NODE_H
+#ifndef HW02_C111115_NODE_H
+#define HW02_C111115_NODE_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 /*
-    AST 노드 구조체
     - name : 현재 노드 이름 저장
     - child : 첫 번째 자식 노드
     - sibling : 형제 노드 연결
@@ -23,12 +22,24 @@ typedef struct node {
 static Node* createNode(const char* name) {
     Node* n = (Node*)malloc(sizeof(Node));
 
-    strcpy(n->name, name);
+    새 AST 노드를 생성하는 함수이다.
 
-    n->child = NULL;
-    n->sibling = NULL;
+    전달받은 문자열을 label에 저장하고,
+    처음 생성되는 노드이므로 child와 sibling 포인터는 전부 NULL로 초기화한다.
 
-    return n;
+    parser에서 AST를 구성할 때 필요한 노드를 계속 동적으로 생성하기 위해
+    malloc을 이용해서 구현했다.
+*/
+
+static Node* makeNode(const char* text) {
+
+    Node* newNode = (Node*)malloc(sizeof(Node));
+
+    strcpy(newNode->label, text);
+
+    newNode->child = NULL;
+    newNode->sibling = NULL;
+
 }
 
 /*
@@ -38,16 +49,34 @@ static Node* createNode(const char* name) {
 static void addChild(Node* parent, Node* child) {
     if (!child) return;
 
-    if (!parent->child) {
-        parent->child = child;
+/*
+    부모 노드 아래에 자식 노드를 추가하는 함수이다.
+
+    아직 자식 노드가 없는 경우에는 첫 번째 child로 바로 연결하고,
+    이미 자식이 존재하는 경우에는 마지막 sibling까지 이동한 뒤
+    가장 뒤에 이어붙이는 방식으로 처리했다.
+
+    declaration이나 statement 순서가 유지되어야 하기 때문에
+    입력된 순서 그대로 연결되도록 구현했다.
+*/
+
+static void pushChild(Node* parent, Node* childNode) {
+
+    if (parent == NULL || childNode == NULL)
+        return;
+
+    if (parent->child == NULL) {
+
+        parent->child = childNode;
     }
     else {
-        Node* temp = parent->child;
 
-        while (temp->sibling)
-            temp = temp->sibling;
+        Node* cur = parent->child;
 
-        temp->sibling = child;
+        while (cur->sibling != NULL)
+            cur = cur->sibling;
+
+        cur->sibling = childNode;
     }
 }
 
@@ -58,9 +87,60 @@ static void addChild(Node* parent, Node* child) {
 static Node* linkSibling(Node* a, Node* b) {
     if (!a) return b;
 
-    Node* temp = a;
+/*
+    형제 노드를 이어붙이는 함수이다.
 
-    while (temp->sibling)
-        temp = temp->sibling;
+    같은 레벨에 존재하는 decl_list나 stmt_list 등을 연결할 때 사용한다.
+
+    a가 NULL이면 바로 b를 반환하고,
+    그렇지 않으면 마지막 sibling까지 이동한 뒤
+    가장 마지막 위치에 b를 연결한다.
+
+    결과적으로 linked list처럼 옆으로 이어지는 구조라고 보면 된다.
+*/
+
+static Node* appendSibling(Node* a, Node* b) {
+
+    if (a == NULL)
+        return b;
+
+    Node* cur = a;
+
+    while (cur->sibling != NULL)
+        cur = cur->sibling;
+
+    cur->sibling = b;
+
+    return a;
+}
+
+
+/*
+    preorder 방식으로 AST를 출력하는 함수이다.
+
+    현재 노드를 먼저 출력한 뒤 child 방향으로 재귀적으로 내려가고,
+    이후 sibling 방향으로 이동하면서 같은 레벨 노드들을 출력한다.
+
+    과제 출력 형식에서 depth 숫자를 같이 출력해야 해서
+    현재 깊이를 depth 변수로 함께 관리하도록 만들었다.
+
+    들여쓰기도 depth만큼 공백을 출력해서
+    트리 구조가 한눈에 보이도록 구현했다.
+*/
+
+static void preorderPrint(Node* root, int depth) {
+
+    if (root == NULL)
+        return;
+
+    for (int i = 0; i < depth; i++)
+        printf("  ");
+
+    printf("%d %s\n", depth, root->label);
+
+    preorderPrint(root->child, depth + 1);
+
+    preorderPrint(root->sibling, depth);
+}
 
 #endif
