@@ -5,12 +5,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
+    AST 노드 구조체
+    - name : 현재 노드 이름 저장
+    - child : 첫 번째 자식 노드
+    - sibling : 형제 노드 연결
+*/
 typedef struct node {
     char name[64];
     struct node* child;
     struct node* sibling;
 } Node;
 
+/*
+    새로운 AST 노드 생성 함수
+*/
 static Node* createNode(const char* name) {
     Node* n = (Node*)malloc(sizeof(Node));
 
@@ -22,6 +31,10 @@ static Node* createNode(const char* name) {
     return n;
 }
 
+/*
+    부모 노드에 자식 노드 연결
+    child가 여러 개일 경우 sibling으로 이어붙임
+*/
 static void addChild(Node* parent, Node* child) {
     if (!child) return;
 
@@ -38,6 +51,10 @@ static void addChild(Node* parent, Node* child) {
     }
 }
 
+/*
+    형제 노드 연결 함수
+    decl_list, stmt_list 등에 사용
+*/
 static Node* linkSibling(Node* a, Node* b) {
     if (!a) return b;
 
@@ -45,22 +62,5 @@ static Node* linkSibling(Node* a, Node* b) {
 
     while (temp->sibling)
         temp = temp->sibling;
-
-    temp->sibling = b;
-
-    return a;
-}
-
-static void printAST(Node* root, int depth) {
-    if (!root) return;
-
-    for (int i = 0; i < depth; i++)
-        printf("  ");
-
-    printf("%d %s\n", depth, root->name);
-
-    printAST(root->child, depth + 1);
-    printAST(root->sibling, depth);
-}
 
 #endif
